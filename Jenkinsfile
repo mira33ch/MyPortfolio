@@ -67,6 +67,16 @@ pipeline {
                 }
             }
         }
+         stage('Test Frontend') {
+            steps {
+                dir('portfolio-frontend') {
+                    sh '''
+                    export CHROME_BIN=/usr/bin/google-chrome
+                    npm run test -- --watch=false --browsers=ChromeHeadless --no-sandbox
+                    '''
+                }
+            }
+        }
 
       stage('SonarQube Analysis Backend') {
             steps {
@@ -84,9 +94,12 @@ pipeline {
                dir('portfolio-frontend') {
                    script {
                        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
-                           sh 'npm run test -- --watch=false --code-coverage'
-                           sh 'npm install sonar-scanner' // or have it installed already
-                           sh 'npx sonar-scanner -Dsonar.projectKey=frontend-project-key -Dsonar.sources=src'
+                          sh '''
+                            npx sonar-scanner \
+                              -Dsonar.projectKey=frontend-project-key \
+                              -Dsonar.sources=src \
+                              -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+                            '''
                        }
                    }
                }
