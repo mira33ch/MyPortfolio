@@ -61,7 +61,7 @@ pipeline {
 
         stage("Test Application") {
             steps {
-                dir('backend') {
+                dir('demo1') {
                     sh 'mvn test'
                 }
             }
