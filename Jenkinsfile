@@ -67,15 +67,17 @@ pipeline {
             }
         }
 
-       stage("SonarQube Analysis") {
-          steps {
-              dir('demo1') {
-                 withSonarQubeEnv('sonarqube-scanner') {
-                     sh "mvn sonar:sonar"
-                 }
-              }
-          }
-       }
+      stage('SonarQube Analysis Backend') {
+            steps {
+                dir('demo1') {
+                    script {
+                        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                            sh 'mvn sonar:sonar'
+                        }
+                    }
+                }
+            }
+        }
 
 
         stage('Stop MySQL') {
