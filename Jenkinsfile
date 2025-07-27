@@ -78,6 +78,19 @@ pipeline {
                 }
             }
         }
+     stage('SonarQube Frontend Analysis') {
+           steps {
+               dir('portfolio-frontend') {
+                   script {
+                       withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                           sh 'npm install sonar-scanner' // or have it installed already
+                           sh 'npx sonar-scanner -Dsonar.projectKey=frontend-project-key -Dsonar.sources=src'
+                       }
+                   }
+               }
+           }
+     }
+
 
 
         stage('Stop MySQL') {
