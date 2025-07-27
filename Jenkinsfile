@@ -15,6 +15,7 @@ pipeline {
     stages {
         stage('Start MySQL (no password)') {
             steps {
+                sh 'docker rm -f mysql-test || true'
                 sh '''
                 docker run --name mysql-test \
                     -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
