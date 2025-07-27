@@ -70,7 +70,7 @@ pipeline {
        stage("SonarQube Analysis") {
           steps {
               dir('demo1') {
-                 withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                 withSonarQubeEnv('sonarqube-scanner') {
                      sh "mvn sonar:sonar"
                  }
               }
