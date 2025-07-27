@@ -83,6 +83,7 @@ pipeline {
                dir('portfolio-frontend') {
                    script {
                        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                           sh 'npm run test -- --watch=false --code-coverage'
                            sh 'npm install sonar-scanner' // or have it installed already
                            sh 'npx sonar-scanner -Dsonar.projectKey=frontend-project-key -Dsonar.sources=src'
                        }
