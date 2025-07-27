@@ -45,13 +45,13 @@ pipeline {
             steps {
                 script {
                     // Build Angular frontend
-                    dir('frontend') {
+                    dir('portfolio-frontend') {
                         sh 'npm install'
                         sh 'npm run build --prod'
                     }
 
                     // Build Spring Boot backend
-                    dir('backend') {
+                    dir('demo1') {
                         sh 'mvn clean package -DskipTests'
                     }
                 }
