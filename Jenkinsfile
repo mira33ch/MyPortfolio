@@ -72,7 +72,7 @@ pipeline {
                 dir('portfolio-frontend') {
                     sh '''
                     export CHROME_BIN=/usr/bin/google-chrome
-                    npm run test -- --watch=false --browsers=ChromeHeadless --no-sandbox
+                    npm run test -- --watch=false --browsers=ChromeHeadless 
                     '''
                 }
             }
