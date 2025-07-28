@@ -10,6 +10,12 @@ pipeline {
     environment {
         MYSQL_DB = 'database'
         MYSQL_PORT = '3306'
+        APP_NAME = "portfolio-app-pipeline"
+        RELEASE = "1.0.0"
+        DOCKER_USER = "mariem360"
+        DOCKER_PASS = 'dockerhub'
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
     }
 
     stages {
@@ -97,6 +103,25 @@ pipeline {
                   waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
               }
           }
+     }
+     stage('Build & Push Docker Images') {
+         steps {
+             script {
+                    // Build and push backend image
+                 docker.withRegistry('', DOCKER_PASS) {
+                     def backendImage = docker.build("${IMAGE_NAME}-backend:${IMAGE_TAG}", 'demo1/')
+                     backendImage.push()
+                     backendImage.push('latest')
+                 }
+
+                    // Build and push frontend image
+                 docker.withRegistry('', DOCKER_PASS) {
+                     def frontendImage = docker.build("${IMAGE_NAME}-frontend:${IMAGE_TAG}", 'portfolio-frontend/')
+                     frontendImage.push()
+                     frontendImage.push('latest')
+                 }
+             }
+         }
      }
 
         stage('Stop MySQL') {
