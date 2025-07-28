@@ -141,6 +141,17 @@ pipeline {
             }
         }
     }
+	 stage('Cleanup Artifacts') {
+            steps {
+                script {
+                    sh "docker rmi ${IMAGE_NAME}-backend:${IMAGE_TAG} || true"
+                    sh "docker rmi ${IMAGE_NAME}-backend:latest || true"
+                    sh "docker rmi ${IMAGE_NAME}-frontend:${IMAGE_TAG} || true"
+                    sh "docker rmi ${IMAGE_NAME}-frontend:latest || true"
+                }
+            }
+        }
+    }
 
     post {
         always {
