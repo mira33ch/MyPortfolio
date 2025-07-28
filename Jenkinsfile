@@ -23,15 +23,15 @@ pipeline {
             steps {
                 sh 'docker rm -f mysql-test || true'
                 sh '''
-                docker run --name mysql-test \
-                    -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
-                    -e MYSQL_DATABASE=$MYSQL_DB \
-                    -p $MYSQL_PORT:3306 \
-                    -d mysql:8.0 \
-                    --default-authentication-plugin=mysql_native_password
+                    docker run --name mysql-test \
+                        -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+                        -e MYSQL_DATABASE=$MYSQL_DB \
+                        -p $MYSQL_PORT:3306 \
+                        -d mysql:8.0 \
+                        --default-authentication-plugin=mysql_native_password
 
-                echo "Waiting for MySQL to start..."
-                sleep 20
+                    echo "Waiting for MySQL to start..."
+                    sleep 20
                 '''
             }
         }
@@ -73,7 +73,7 @@ pipeline {
             }
         }
 
-      stage('SonarQube Analysis Backend') {
+        stage('SonarQube Analysis Backend') {
             steps {
                 dir('demo1') {
                     script {
@@ -84,64 +84,63 @@ pipeline {
                 }
             }
         }
-     stage('SonarQube Frontend Analysis') {
-           steps {
-               dir('portfolio-frontend') {
-                   script {
-                       withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
-                           sh 'npm install sonar-scanner' // or have it installed already
-                           sh 'npx sonar-scanner -Dsonar.projectKey=frontend-project-key -Dsonar.sources=src'
-                       }
-                   }
-               }
-           }
-     }
 
-     stage('Quality Gate') {
-          steps {
-              script {
-                  waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
-              }
-          }
-     }
-     stage('Build & Push Docker Images') {
-         steps {
-             script {
-                    // Build and push backend image
-                 docker.withRegistry('', DOCKER_PASS) {
-                     def backendImage = docker.build("${IMAGE_NAME}-backend:${IMAGE_TAG}", 'demo1/')
-                     backendImage.push()
-                     backendImage.push('latest')
-                 }
-
-                    // Build and push frontend image
-                 docker.withRegistry('', DOCKER_PASS) {
-                     def frontendImage = docker.build("${IMAGE_NAME}-frontend:${IMAGE_TAG}", 'portfolio-frontend/')
-                     frontendImage.push()
-                     frontendImage.push('latest')
-                 }
-             }
-         }
-     }
-     stage("Trivy Scan") {
-        steps {
-            script {
-	            sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-pipeline-frontend:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
-                sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-pipeline-backend:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
+        stage('SonarQube Frontend Analysis') {
+            steps {
+                dir('portfolio-frontend') {
+                    script {
+                        withSonarQubeEnv(credentialsId: 'jenkins-sonarqube-token') {
+                            sh 'npm install sonar-scanner'
+                            sh 'npx sonar-scanner -Dsonar.projectKey=frontend-project-key -Dsonar.sources=src'
+                        }
+                    }
+                }
             }
         }
-     }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'jenkins-sonarqube-token'
+                }
+            }
+        }
+
+        stage('Build & Push Docker Images') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_PASS) {
+                        def backendImage = docker.build("${IMAGE_NAME}-backend:${IMAGE_TAG}", 'demo1/')
+                        backendImage.push()
+                        backendImage.push('latest')
+
+                        def frontendImage = docker.build("${IMAGE_NAME}-frontend:${IMAGE_TAG}", 'portfolio-frontend/')
+                        frontendImage.push()
+                        frontendImage.push('latest')
+                    }
+                }
+            }
+        }
+
+        stage("Trivy Scan") {
+            steps {
+                script {
+                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-pipeline-frontend:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
+                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-pipeline-backend:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
+                }
+            }
+        }
 
         stage('Stop MySQL') {
             steps {
                 sh '''
-                docker stop mysql-test || true
-                docker rm mysql-test || true
+                    docker stop mysql-test || true
+                    docker rm mysql-test || true
                 '''
             }
         }
-    
-	 stage('Cleanup Artifacts') {
+
+        stage('Cleanup Artifacts') {
             steps {
                 script {
                     sh "docker rmi ${IMAGE_NAME}-backend:${IMAGE_TAG} || true"
@@ -151,7 +150,7 @@ pipeline {
                 }
             }
         }
-    
+    }
 
     post {
         always {
