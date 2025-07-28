@@ -140,7 +140,7 @@ pipeline {
                 '''
             }
         }
-    }
+    
 	 stage('Cleanup Artifacts') {
             steps {
                 script {
@@ -151,7 +151,7 @@ pipeline {
                 }
             }
         }
-    }
+    
 
     post {
         always {
