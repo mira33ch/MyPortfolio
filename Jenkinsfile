@@ -10,7 +10,7 @@ pipeline {
     environment {
         MYSQL_DB = 'database'
         MYSQL_PORT = '3306'
-        APP_NAME = "portfolio-app-pipeline"
+        APP_NAME = "portfolio-app-cicd-pipeline"
         RELEASE = "1.0.0"
         DOCKER_USER = "mariem360"
         DOCKER_PASS = 'dockerhub'
@@ -125,8 +125,8 @@ pipeline {
         stage("Trivy Scan") {
             steps {
                 script {
-                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-pipeline-frontend:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
-                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-pipeline-backend:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
+                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-cicd-pipeline-frontend:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
+                    sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image mariem360/portfolio-app-cicd-pipeline-backend:latest --no-progress --scanners vuln --exit-code 0 --severity HIGH,CRITICAL --format table'
                 }
             }
         }
