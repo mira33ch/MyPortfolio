@@ -5,6 +5,6 @@ WORKDIR /app
 # Copy the Spring Boot JAR built by your pipeline
 COPY target/*-SNAPSHOT.jar app.jar
 
-EXPOSE 8089
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
